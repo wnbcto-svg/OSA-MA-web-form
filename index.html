@@ -425,8 +425,33 @@ tbody tr:last-child { border-bottom: none; }
   </tbody>
 </table>
 
+
+  
+<hr style="margin:40px 0;">
+
+<h2>休養感のアンケート</h2>
+
+<p>
+昨晩の睡眠で充分な休養がとれましたか。<br>
+あてはまる回答を一つ選んでください。
+</p>
+
+<div style="line-height:2;">
+  <label><input type="radio" name="restfulness" value="1" required> 1. 充分にとれた</label><br>
+  <label><input type="radio" name="restfulness" value="2"> 2. まあまあとれた</label><br>
+  <label><input type="radio" name="restfulness" value="3"> 3. どちらでもない</label><br>
+  <label><input type="radio" name="restfulness" value="4"> 4. あまりとれなかった</label><br>
+  <label><input type="radio" name="restfulness" value="5"> 5. まったくとれなかった</label>
+</div>
+
 <br>
-<button type="submit">送信</button>
+
+<div id="sendingMessage" style="display:none; color:red; font-weight:bold; margin-bottom:15px;">
+回答送信中です。画面を閉じずにお待ち下さい。
+</div>
+
+<button type="submit" id="submitBtn">送信</button>
+  
 </form>
 
 <script>
@@ -455,35 +480,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ===== submit ===== */
   document.getElementById("osaForm").addEventListener("submit", e => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const answers = {};
-    new FormData(e.target).forEach((v, k) => {
-      if (k.startsWith("q")) answers[k] = Number(v);
-    });
+  document.getElementById("submitBtn").disabled = true;
+  document.getElementById("sendingMessage").style.display = "block";
 
-    const payload = {
-      timestamp_st: inputStartTime,
-      timestamp_fin: toTokyoTimeString(new Date()),
-      id: document.getElementById("subject_id").value,
-      rest_time: rest_time.value,
-      wake_time: wake_time.value,
-      sleep_time: sleep_time.value,
-      answers
-    };
-
-    console.log("送信データ", payload);
-
-    fetch("https://script.google.com/macros/s/AKfycbx6140na6GYyoIBe-2Inw_a9RI87gfsMbpJiPO0aUgZFPsQneMKCZTE_PdHogPXejhFVw/exec", {
-      method: "POST",
-      mode: "no-cors",
-      body: JSON.stringify(payload)
-    }).then(() => {
-      alert("送信が完了しました");
-      location.href = "https://202590-50-mgc001-hqlc.glide.page";
-    });
+  const answers = {};
+  new FormData(e.target).forEach((v, k) => {
+    if (k.startsWith("q")) answers[k] = Number(v);
   });
 
+  const payload = {
+    timestamp_st: inputStartTime,
+    timestamp_fin: toTokyoTimeString(new Date()),
+    id: document.getElementById("subject_id").value,
+    rest_time: rest_time.value,
+    wake_time: wake_time.value,
+    sleep_time: sleep_time.value,
+    restfulness: document.querySelector('input[name="restfulness"]:checked').value,
+    answers
+  };
+
+  fetch("https://script.google.com/macros/s/AKfycbx6140na6GYyoIBe-2Inw_a9RI87gfsMbpJiPO0aUgZFPsQneMKCZTE_PdHogPXejhFVw/exec", {
+    method: "POST",
+    mode: "no-cors",
+    body: JSON.stringify(payload)
+  }).then(() => {
+    alert("送信が完了しました");
+    location.href = "https://202590-50-mgc001-hqlc.glide.page";
+  });
 });
 </script>
 
